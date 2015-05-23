@@ -24,4 +24,16 @@ exec { "disable-ssl2" :
       provider  => 'powershell',
       logoutput => true,
     }
+ registry::value { 'SSL2.0':
+    key  => 'HKLM\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server',
+    value => 'Enabled',
+    type => 'dword',
+    data => '00000000',
+  }
+ registry::value { 'SSL3.0':
+    key  => 'HKLM\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 3.0\Server',
+    type => 'dword',
+    value => 'Enabled',
+    data => '00000000',
+  }
 }
