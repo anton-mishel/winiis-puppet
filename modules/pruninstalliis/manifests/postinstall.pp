@@ -36,4 +36,11 @@ exec { "disable-ssl2" :
     value => 'Enabled',
     data => '00000000',
   }
+
+exec { "Configure_defaultapppool" :
+      command => "Import-Module WebAdministration \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name enable32BitAppOnWin64 -Value True\nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name managedRuntimeVersion -Value \"\" \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name managedPipelineMode -Value \"Classic\"\n Set-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name queueLength -Value 65535 \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name processModel.idleTimeout -Value \"0\"\n Set-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name Recycling.PeriodicRestart -Value '0'",
+      provider  => 'powershell',
+      logoutput => true,
+      require   => Class['pruninstalliis::install' ],
+    }
 }
