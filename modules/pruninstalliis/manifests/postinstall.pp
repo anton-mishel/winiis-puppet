@@ -1,4 +1,5 @@
 class pruninstalliis::postinstall {
+#Disable compression
 windowsfeature { 'Web-Stat-Compression':
       ensure => absent,
       require => Class['pruninstalliis::install'],
@@ -19,11 +20,7 @@ exec { "isapi-restrictions" :
       logoutput => true,
       require   => Class['pruninstalliis::install' ],
     }
-exec { "disable-ssl2" :
-      command => "Add-WebConfiguration -pspath 'MACHINE/WEBROOT/APPHOST' -filter 'system.webServer/security/isapiCgiRestriction' -value @{\ndescription = 'PRUN'\npath        = 'C:\inetpub\scripts\prun.dll'\n    allowed     = 'True'\n}",
-      provider  => 'powershell',
-      logoutput => true,
-    }
+#Disable SSL 2.0 and 3.0 in registry 
  registry::value { 'SSL2.0':
     key  => 'HKLM\System\CurrentControlSet\Control\SecurityProviders\SCHANNEL\Protocols\SSL 2.0\Server',
     value => 'Enabled',
@@ -36,6 +33,7 @@ exec { "disable-ssl2" :
     value => 'Enabled',
     data => '00000000',
   }
+#Default app pool configuration
 
 exec { "Configure_defaultapppool" :
       command => "Import-Module WebAdministration \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name enable32BitAppOnWin64 -Value True\nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name managedRuntimeVersion -Value \"\" \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name managedPipelineMode -Value \"Classic\"\n Set-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name queueLength -Value 65535 \nSet-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name processModel.idleTimeout -Value \"0\"\n Set-ItemProperty -Path 'IIS:\AppPools\DefaultAppPool\' -Name Recycling.PeriodicRestart -Value '0'",
