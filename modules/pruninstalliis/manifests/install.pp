@@ -12,7 +12,7 @@ class pruninstalliis::install {
         'Web-Default-Doc',
         'Web-Dir-Browsing',
         'Web-Http-Errors',
-        'Web-Http-Errors',
+        'Web-Https-Errors',
         'Web-Static-Content',
         'Web-Http-Logging',
       ]
