@@ -88,11 +88,10 @@ iis::manage_virtual_directory {'xdespellchecker':
 
 #Add handler mapping 
 exec { 'addhandlermapping':
-      command => "New-WebHandler -Name 'PRUN' -Path '*' -ScriptProcessor 'c:\inetpub\scripts\prun.dll'  -Verb '*'  -Modules 'IsapiModule' -PSPath 'IIS:\' -Location $iis_site_name",
-      provider  => 'powershell',
+      #command => "New-WebHandler -Name 'PRUN' -Path '*' -ScriptProcessor 'c:\inetpub\scripts\prun.dll'  -Verb '*'  -Modules 'IsapiModule' -PSPath 'IIS:\' -Location $iis_site_name",
+      command => "C:\Windows\System32\inetsrv\appcmd.exe set config /section:handlers /+[name='PRUN',path='*',verb='*',modules='IsapiModule',scriptProcessor='c:\inetpub\\scripts\prun.dll',resourceType='Unspecified',requireAccess='None']",
       logoutput => true,
     }
-# New-WebHandler -Name "PRUN" -Path "*" -ScriptProcessor "c:\inetpub\scripts\prun.dll"  -Verb '*'  -Modules "IsapiModule" -PSPath "IIS:\" -Location 'Default Web Site'
 
 iis::manage_binding {$iis_site_name:
     site_name    => $iis_site_name,
