@@ -1,5 +1,5 @@
 #
-define iis::manage_virtual_application($site_name, $site_path, $app_pool, $virtual_application_name = $title, $ensure = 'present') {
+define iis::manage_virtual_application($site_name, $site_path, $app_pool, $virtual_application_name, $ensure = 'present') {
   validate_re($ensure, '^(present|installed|absent|purged)$', 'ensure must be one of \'present\', \'installed\', \'absent\', \'purged\'')
 
   if ($ensure in ['present','installed']) {
