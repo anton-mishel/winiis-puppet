@@ -15,10 +15,9 @@ exec { "Configure_iis_errors" :
       require   => Class['pruninstalliis::install' ],
     }
 exec { "isapi-restrictions" :
-      #command => "Add-WebConfiguration -pspath 'IIS:\' -filter 'system.webServer/security/isapiCgiRestriction' -value @{\ndescription = 'PRUN'\npath        = 'C:\inetpub\scripts\prun.dll'\n    allowed     = 'True'\n}",
       command => "Add-WebConfiguration -pspath 'IIS:\' -filter 'system.webServer/security/isapiCgiRestriction' -value @{description='PRUN';path='C:\inetpub\scripts\prun.dll';allowed='True'}",
-      #command => "Add-WebConfiguration -pspath 'IIS:\' -filter 'system.webServer/security/isapiCgiRestriction' -value @{path='C:\inetpub\scripts\prun.dll'}",
       provider  => 'powershell',
+      unless => 'C:\Windows\System32\inetsrv\appcmd.exe list config /section:isapiCgiRestriction | findstr "PRUN"',
       logoutput => true,
       require   => Class['pruninstalliis::install' ],
     }
@@ -42,5 +41,29 @@ exec { "Configure_defaultapppool" :
       provider  => 'powershell',
       logoutput => true,
       require   => Class['pruninstalliis::install' ],
+    }
+
+# Move logs to disk D:
+
+file {'D:/IIS_Logs/':
+    ensure => "directory",
+}
+
+exec { "Configure_iis_logdir" :
+      command   => "Import-Module WebAdministration;Set-WebConfigurationProperty '/system.applicationHost/sites/siteDefaults' -name logfile.directory -value D:\IIS_Logs",
+      provider  => 'powershell',
+      logoutput => true,
+      require   => File['D:/IIS_Logs/' ],
+    }
+# Additional request filtering capabilities
+
+exec { "disallowunlisted":
+       command => "C:\Windows\System32\inetsrv\appcmd.exe set config  /section:requestfiltering /fileExtensions.allowunlisted:false",
+       logoutput => true,
+    }
+	
+exec { "disallowhighbitcharacters":
+       command => "C:\Windows\System32\inetsrv\appcmd.exe set config /section:requestfiltering /allowhighbitcharacters:false",
+       logoutput => true,
     }
 }

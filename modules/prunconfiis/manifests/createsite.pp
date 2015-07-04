@@ -87,14 +87,26 @@ exec { "${iis_site_name}/Set-Access-Policy-Corda":
       provider  => 'powershell',
       logoutput => true,
     }
+#Addjust log dir
+file {"D:/IIS_Logs/${iis_site_name}":
+    ensure => "directory",
+}
+
+exec {"${iis_site_name}/Configure_logdir":
+     command   => "Import-Module WebAdministration \nSet-ItemProperty 'IIS:\Sites\\${iis_site_name}' -name logfile.directory 'D:/IIS_Logs/${iis_site_name}'",
+     provider  => 'powershell',
+     logoutput => true,
+     require   => File["D:/IIS_Logs/${iis_site_name}"],
+    }
 
 
 #Add handler mapping 
-exec { "${iis_site_name}/addhandlermapping":
-      #command => "New-WebHandler -Name 'PRUN' -Path '*' -ScriptProcessor 'c:\inetpub\scripts\prun.dll'  -Verb '*'  -Modules 'IsapiModule' -PSPath 'IIS:\' -Location $iis_site_name",
-      command => "C:\Windows\System32\inetsrv\appcmd.exe set config /section:handlers /+[name='PRUN',path='*',verb='*',modules='IsapiModule',scriptProcessor='c:\inetpub\\scripts\prun.dll',resourceType='Unspecified',requireAccess='None']",
-      logoutput => true,
-    }
+#exec { "${iis_site_name}/addhandlermapping":
+#      #command => "New-WebHandler -Name 'PRUN' -Path '*' -ScriptProcessor 'c:\inetpub\scripts\prun.dll'  -Verb '*'  -Modules 'IsapiModule' -PSPath 'IIS:\' -Location $iis_site_name",
+#      command => "C:\Windows\System32\inetsrv\appcmd.exe set config /section:handlers /+\"[name='PRUN',path='*',verb='*',modules='IsapiModule',scriptProcessor='c:\inetpub\scripts\prun.dll',resourceType='Unspecified',requireAccess='None']\"",
+#      unless => 'C:\Windows\System32\inetsrv\appcmd.exe list config /section:handlers | findstr "PRUN"',
+#      logoutput => true,
+#    }
 
 iis::manage_binding {$iis_site_name:
     site_name    => $iis_site_name,
@@ -104,5 +116,6 @@ iis::manage_binding {$iis_site_name:
     host_header   => $iis_host_header,
     certificate_thumbprint => $iis_certificate_thumbprint 
   }
+
 
 } 
