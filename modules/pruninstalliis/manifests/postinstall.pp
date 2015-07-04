@@ -47,6 +47,7 @@ exec { "Configure_defaultapppool" :
 
 file {'D:/IIS_Logs/':
     ensure => "directory",
+    require => Class['pruninstalliis::install'],
 }
 
 exec { "Configure_iis_logdir" :
@@ -60,10 +61,12 @@ exec { "Configure_iis_logdir" :
 exec { "disallowunlisted":
        command => "C:\Windows\System32\inetsrv\appcmd.exe set config  /section:requestfiltering /fileExtensions.allowunlisted:false",
        logoutput => true,
+       require => Class['pruninstalliis::install'],
     }
 	
 exec { "disallowhighbitcharacters":
        command => "C:\Windows\System32\inetsrv\appcmd.exe set config /section:requestfiltering /allowhighbitcharacters:false",
        logoutput => true,
+       require => Class['pruninstalliis::install'],
     }
 }
